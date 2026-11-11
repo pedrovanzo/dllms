@@ -21,6 +21,33 @@ A local app with a navigable UI that works like a **map of every LLM session on 
 
 MVP placeholder: pages and layout use **mocked session data**. Reading real session files comes next.
 
+| Page | Route | What it shows |
+|---|---|---|
+| Home | `/` | Presentation, plus the sessions folder dllms would read and whether it exists |
+| Sessions | `/sessions` | All sessions, grouped by working directory |
+| Session | `/sessions/<id>` | Details and quick actions: open the folder or transcript in VS Code, copy the resume command, folder path or session ID |
+
+## Run it
+
+Requires Node.js 20.9 or newer.
+
+```bash
+npm install
+npm run dev
+```
+
+Then open http://localhost:3000.
+
+For a production build: `npm run build`, then `npm start`.
+
+## Configuration
+
+By default, dllms reads Claude Code sessions from `~/.claude/projects`, which resolves on macOS, Linux and Windows. To use another folder, copy `.env.example` to `.env.local` and set `DLLMS_SESSIONS_DIR`.
+
+## Stack
+
+Next.js 16 (App Router, Cache Components), React 19, TypeScript and Tailwind CSS 4. The server side runs on Node, so it can read local session files directly. Mocked data lives in `src/lib/mock-sessions.ts`, and `src/lib/sessions.ts` is where the real reader will plug in.
+
 ## Privacy
 
 Session files can contain sensitive information. dllms is meant to read them locally only and never send them anywhere.
