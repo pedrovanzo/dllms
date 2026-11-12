@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
+import { RefreshButton } from "@/components/RefreshButton";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -26,7 +27,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <header className="border-b border-neutral-200 dark:border-neutral-800">
-          <nav className="mx-auto flex max-w-5xl items-center gap-6 px-6 py-4">
+          <nav className="mx-auto flex max-w-5xl items-center gap-5 px-6 py-3">
             <Link href="/" className="font-mono text-lg font-semibold">
               dllms
             </Link>
@@ -36,9 +37,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             >
               Sessions
             </Link>
-            <span className="ml-auto rounded bg-amber-100 px-2 py-0.5 text-xs text-amber-900 dark:bg-amber-900/40 dark:text-amber-200">
-              MVP · mocked data
-            </span>
+            <RefreshButton className="ml-auto" />
           </nav>
         </header>
         <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-10">{children}</main>

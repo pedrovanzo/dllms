@@ -14,18 +14,26 @@ A local app with a navigable UI that works like a **map of every LLM session on 
 - **Predefined sources.** The app knows where and how to read each tool's session files, starting with Claude Code (`~/.claude/projects`).
 - **Cross-platform.** The default sessions folder resolves on both macOS and Windows, and it can be changed.
 - **Grouped by directory.** Sessions are listed in groups, one per working directory.
-- **Session details.** Title, created and modified timestamps, working directory and quick actions: open the folder in VS Code, copy the exact resume command, and more.
+- **Session details.** Title, created and modified timestamps, working directory and quick actions: copy a VS Code command to open the folder, copy the exact resume command, and more.
 - **Summaries: later.** How to summarize a session is still to be decided.
 
 ## Status
 
-MVP placeholder: pages and layout use **mocked session data**. Reading real session files comes next.
+MVP: reads real Claude Code session files from disk on every page load. No auto-refresh — use the Refresh button on the Sessions page to pick up anything new.
 
 | Page | Route | What it shows |
 |---|---|---|
 | Home | `/` | Presentation, plus the sessions folder dllms would read and whether it exists |
 | Sessions | `/sessions` | All sessions, grouped by working directory |
-| Session | `/sessions/<id>` | Details and quick actions: open the folder or transcript in VS Code, copy the resume command, folder path or session ID |
+| Session | `/sessions/<id>` | Details and quick actions: copy VS Code commands for the folder or transcript, copy the resume command, folder path or session ID |
+
+## Platform support
+
+Officially supported: **macOS** and **Windows**. Linux is untested and not officially supported.
+
+Windows note: the resume/start commands are emitted as separate lines (not chained with `;` or `&&`), since Command Prompt doesn't support `;` and Windows PowerShell 5.1 doesn't support `&&`. Pasting multiple lines into any Windows shell runs them in order regardless.
+
+The "Copy VS Code command" actions produce `code -n "<path>"`, which requires the `code` CLI on your `PATH` (VS Code: Command Palette → "Shell Command: Install 'code' command in PATH"). They deliberately don't use `vscode://file/...` links — that URI scheme reuses an already-open VS Code window by default, which can silently replace one you're actively working in.
 
 ## Run it
 
@@ -42,11 +50,11 @@ For a production build: `npm run build`, then `npm start`.
 
 ## Configuration
 
-By default, dllms reads Claude Code sessions from `~/.claude/projects`, which resolves on macOS, Linux and Windows. To use another folder, copy `.env.example` to `.env.local` and set `DLLMS_SESSIONS_DIR`.
+By default, dllms reads Claude Code sessions from `~/.claude/projects`. To use another folder, copy `.env.example` to `.env.local` and set `DLLMS_SESSIONS_DIR`.
 
 ## Stack
 
-Next.js 16 (App Router, Cache Components), React 19, TypeScript and Tailwind CSS 4. The server side runs on Node, so it can read local session files directly. Mocked data lives in `src/lib/mock-sessions.ts`, and `src/lib/sessions.ts` is where the real reader will plug in.
+Next.js 16 (App Router, Cache Components), React 19, TypeScript and Tailwind CSS 4. The server side runs on Node, so it can read local session files directly. `src/lib/sessions.ts` parses Claude Code's JSONL session files straight off disk.
 
 ## Privacy
 

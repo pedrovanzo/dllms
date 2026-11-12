@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
+import { LoadingState } from "@/components/LoadingState";
 import { getSessionsSource } from "@/lib/config";
 
 const features = [
   ["Assembled on the spot", "Built from the tools' own files every time. Nothing is stored."],
   ["Grouped by directory", "One list per working directory, newest activity first."],
-  ["Jump back in", "Open the folder in VS Code or copy the exact resume command."],
+  ["Jump back in", "Copy the exact resume command, or the VS Code command to open the folder."],
 ];
 
 export default function Home() {
@@ -35,7 +36,7 @@ export default function Home() {
         ))}
       </section>
 
-      <Suspense fallback={<p className="text-sm text-neutral-500">Checking sessions folder…</p>}>
+      <Suspense fallback={<LoadingState text="Checking sessions folder…" size="sm" />}>
         <SessionsSource />
       </Suspense>
     </div>
@@ -59,9 +60,16 @@ async function SessionsSource() {
         <dd>{source.overridden ? "DLLMS_SESSIONS_DIR" : "default (~/.claude/projects)"}</dd>
         <dt className="text-neutral-500">Found on disk</dt>
         <dd>{source.exists ? "yes" : "no"}</dd>
+        <dt className="text-neutral-500">This machine</dt>
+        <dd>{source.platform}</dd>
       </dl>
       <p className="mt-3 text-neutral-500">
-        The MVP shows mocked sessions. Reading this folder comes next.
+        Sessions are read from this folder on every visit. Use Refresh on the Sessions page to
+        pull in anything new without navigating away.
+      </p>
+      <p className="mt-2 text-neutral-500">
+        dllms officially supports <strong>macOS</strong> and <strong>Windows</strong>. Linux is
+        untested and not officially supported.
       </p>
     </section>
   );

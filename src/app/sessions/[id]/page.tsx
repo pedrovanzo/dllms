@@ -1,12 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { ActivityBadge } from "@/components/ActivityBadge";
 import { CopyButton } from "@/components/CopyButton";
-import { formatDate, resumeCommand, vscodeUri } from "@/lib/format";
+import { LoadingState } from "@/components/LoadingState";
+import { formatDate, resumeCommand, vscodeCommand } from "@/lib/format";
 import { getSession } from "@/lib/sessions";
-
-const linkClass =
-  "rounded-md border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800";
 
 // The session ID is only known at request time, so it is read inside <Suspense>
 // (Cache Components pattern from the bundled Next.js docs: dynamic-routes.md).
@@ -16,7 +15,7 @@ export default function SessionPage(props: PageProps<"/sessions/[id]">) {
       <Link href="/sessions" className="text-sm text-neutral-500 hover:underline">
         ← All sessions
       </Link>
-      <Suspense fallback={<p className="text-neutral-500">Loading session…</p>}>
+      <Suspense fallback={<LoadingState text="Loading session…" />}>
         {props.params.then(({ id }) => (
           <SessionDetails id={id} />
         ))}
@@ -30,23 +29,28 @@ async function SessionDetails({ id }: { id: string }) {
   if (!session) notFound();
 
   const resume = resumeCommand(session.cwd, session.id);
+  // Already request-time: `id` above came from the params promise, so this render can't be prerendered anyway.
+  // eslint-disable-next-line react-hooks/purity
+  const now = Date.now();
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">{session.title}</h1>
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="text-3xl font-bold tracking-tight">{session.title}</h1>
+          <ActivityBadge iso={session.modified} now={now} />
+        </div>
         <p className="mt-1 font-mono text-sm text-neutral-500 break-all">{session.cwd}</p>
       </div>
 
       <section className="space-y-3">
         <h2 className="font-semibold">Actions</h2>
         <div className="flex flex-wrap gap-2">
-          <a href={vscodeUri(session.cwd)} className={linkClass}>
-            Open folder in VS Code
-          </a>
-          <a href={vscodeUri(session.transcriptPath)} className={linkClass}>
-            Open transcript in VS Code
-          </a>
+          <CopyButton text={vscodeCommand(session.cwd)} label="Copy VS Code command (folder)" />
+          <CopyButton
+            text={vscodeCommand(session.transcriptPath)}
+            label="Copy VS Code command (transcript)"
+          />
           <CopyButton text={resume} label="Copy resume command" />
           <CopyButton text={session.cwd} label="Copy folder path" />
           <CopyButton text={session.id} label="Copy session ID" />

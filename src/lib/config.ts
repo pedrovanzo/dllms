@@ -5,7 +5,8 @@ import path from "node:path";
 
 /**
  * Folder where Claude Code keeps its sessions.
- * Default: `~/.claude/projects`, which resolves on macOS, Linux and Windows.
+ * Default: `~/.claude/projects`. dllms officially supports macOS and Windows;
+ * Linux is untested.
  * Override with the `DLLMS_SESSIONS_DIR` environment variable (see `.env.example`).
  */
 export function getSessionsDir(): string {
